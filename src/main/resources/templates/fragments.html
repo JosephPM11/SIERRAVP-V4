@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:fragment="commonhead">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>SIERRAVP · UNMSM</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+
+<body>
+
+<!-- Header institucional + navegación -->
+<th:block th:fragment="topbar">
+    <header class="site-header">
+        <div class="site-header-inner">
+            <div class="brand">
+                <div class="brand-mark">UNMSM</div>
+                <div>
+                    <div class="brand-title">SIERRAVP</div>
+                    <div class="brand-sub">Sistema de Evaluación del Rendimiento Académico</div>
+                </div>
+            </div>
+            <div class="session" sec:authorize="isAuthenticated()">
+                <span class="session-user" sec:authentication="name">correo</span>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="btn-logout">Cerrar sesión</button>
+                </form>
+            </div>
+        </div>
+        <nav class="site-nav">
+            <div class="site-nav-inner">
+                <a th:href="@{/dashboard}">Inicio</a>
+                <a sec:authorize="hasRole('PROFESOR')" th:href="@{/profesor}">Mis cursos</a>
+                <a sec:authorize="hasRole('ALUMNO')" th:href="@{/alumno}">Mi rendimiento</a>
+                <a sec:authorize="hasRole('ADMIN')" th:href="@{/sistema}">Gestión académica</a>
+                <a sec:authorize="hasRole('ADMIN')" th:href="@{/analitica}">Reportes</a>
+            </div>
+        </nav>
+    </header>
+</th:block>
+
+<!-- Pie de página institucional -->
+<footer th:fragment="footer" class="site-footer">
+    <div class="site-footer-inner">
+        Universidad Nacional Mayor de San Marcos · Facultad de Ingeniería de Sistemas e Informática<br/>
+        SIERRAVP — Sistema de Evaluación del Rendimiento Académico
+    </div>
+</footer>
+
+</body>
+</html>

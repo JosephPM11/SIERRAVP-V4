@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: commonhead}"></head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+
+<div class="container" th:object="${rendimiento}">
+    <div th:if="${rendimiento == null}" class="card">
+        <p class="muted">No se encontró información de rendimiento para tu usuario.</p>
+    </div>
+
+    <div th:if="${rendimiento != null}">
+        <h1 class="page-title" th:text="*{nombre}">Alumno</h1>
+        <p class="page-sub">
+            Código <strong th:text="*{codigo}"></strong> ·
+            <span th:text="*{escuela}"></span> · <span th:text="*{facultad}"></span>
+        </p>
+
+        <div class="grid">
+            <div class="card card-accent">
+                <p class="stat-label">Coeficiente de rendimiento</p>
+                <p class="stat-value" th:text="${#numbers.formatDecimal(rendimiento.craPonderado,1,2)}">0.00</p>
+                <p class="stat-hint">Nota normalizada respecto al promedio del salón (escala 0–20, media 10).</p>
+            </div>
+            <div class="card card-accent">
+                <p class="stat-label">Posición en el ranking</p>
+                <p class="stat-value">#<span th:text="*{posicionRanking}">0</span></p>
+                <p class="stat-hint">Dentro de tu Escuela Profesional.</p>
+            </div>
+        </div>
+
+        <h2 style="margin-top:8px">Histórico de notas</h2>
+        <p class="muted" th:if="${#lists.isEmpty(rendimiento.periodos)}">Aún no tienes notas registradas.</p>
+
+        <div class="card" th:each="p : *{periodos}">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <h3 style="margin:0">Periodo <span th:text="${p.periodo}">2026-I</span></h3>
+                <span class="badge" th:if="${p.cra != null}">CRA del periodo: <span th:text="${#numbers.formatDecimal(p.cra,1,2)}"></span></span>
+            </div>
+            <table>
+                <thead>
+                <tr><th>Curso</th><th class="num">EC</th><th class="num">EP</th><th class="num">EF</th><th class="num">Ponderado</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="c : ${p.cursos}">
+                    <td th:text="${c.curso}">Curso</td>
+                    <td class="num" th:text="${c.ec != null ? c.ec : '—'}">-</td>
+                    <td class="num" th:text="${c.ep != null ? c.ep : '—'}">-</td>
+                    <td class="num" th:text="${c.ef != null ? c.ef : '—'}">-</td>
+                    <td class="num" th:text="${c.ponderado != null ? #numbers.formatDecimal(c.ponderado,1,2) : '—'}">-</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

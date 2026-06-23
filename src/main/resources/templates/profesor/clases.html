@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: commonhead}"></head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+
+<div class="container">
+    <h1 class="page-title">Mis cursos</h1>
+    <p class="page-sub">Selecciona un curso para ingresar o consultar notas. Los periodos cerrados son de solo lectura.</p>
+
+    <div class="card">
+        <table>
+            <thead>
+            <tr><th>Curso</th><th>Periodo</th><th>Estado</th><th class="num">Alumnos</th><th></th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${clases}">
+                <td th:text="${c.curso}">Curso</td>
+                <td th:text="${c.periodo}">2026-I</td>
+                <td>
+                    <span th:if="${c.editable}" class="badge green">Abierto</span>
+                    <span th:unless="${c.editable}" class="badge closed">Cerrado</span>
+                </td>
+                <td class="num" th:text="${c.numAlumnos}">0</td>
+                <td>
+                    <a class="btn" th:if="${c.editable}" th:href="@{'/profesor/clase/' + ${c.id}}">Ingresar notas</a>
+                    <a class="btn gray" th:unless="${c.editable}" th:href="@{'/profesor/clase/' + ${c.id}}">Ver notas</a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(clases)}">
+                <td colspan="5" class="muted">No tienes cursos asignados.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

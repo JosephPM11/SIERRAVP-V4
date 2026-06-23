@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: commonhead}"></head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+
+<div class="container">
+    <h1 class="page-title">Reportes gerenciales</h1>
+    <p class="page-sub">Consolidación de datos y reportes analíticos de rendimiento.</p>
+
+    <div class="flash" th:if="${msg}" th:text="${msg}"></div>
+
+    <div class="grid">
+        <div class="card card-accent">
+            <p class="stat-label">Notas consolidadas</p>
+            <p class="stat-value" th:text="${totalHechoNota}">0</p>
+        </div>
+        <div class="card card-accent">
+            <p class="stat-label">Rendimientos consolidados</p>
+            <p class="stat-value" th:text="${totalHechoCra}">0</p>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h2>Actualizar consolidado</h2>
+            <p class="muted">Consolida la información académica para los reportes gerenciales.</p>
+            <form th:action="@{/analitica/etl}" method="post">
+                <button class="btn green" type="submit">Actualizar datos</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Reportes analíticos</h2>
+            <p class="muted">Promedios por facultad, ranking por escuela, histórico y estadísticas.</p>
+            <a class="btn" th:href="@{/analitica/olap}">Ver reportes</a>
+        </div>
+
+        <div class="card">
+            <h2>Respaldo y distribución</h2>
+            <p class="muted">Publica el consolidado y genera una copia de respaldo.</p>
+            <form class="inline-form" th:action="@{/analitica/ftp}" method="post" style="display:inline">
+                <button class="btn gray" type="submit">Publicar</button>
+            </form>
+            <form class="inline-form" th:action="@{/analitica/mirror}" method="post" style="display:inline">
+                <button class="btn gray" type="submit">Respaldar</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

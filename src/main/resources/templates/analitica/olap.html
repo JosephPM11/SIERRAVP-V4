@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: commonhead}"></head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+
+<div class="container">
+    <p class="crumb"><a th:href="@{/analitica}">&larr; Reportes</a></p>
+    <h1 class="page-title">Reportes analíticos</h1>
+    <p class="page-sub">Indicadores de rendimiento consolidados.</p>
+
+    <div class="card">
+        <h2>Promedio de nota final por Facultad y Periodo</h2>
+        <table>
+            <thead><tr><th>Facultad</th><th>Periodo</th><th class="num">Promedio</th></tr></thead>
+            <tbody>
+            <tr th:each="r : ${promedioFacPer}">
+                <td th:text="${r[0]}">Facultad</td>
+                <td th:text="${r[1]}">2026-I</td>
+                <td class="num" th:text="${#numbers.formatDecimal(r[2],1,2)}">0.00</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(promedioFacPer)}">
+                <td colspan="3" class="muted">Sin datos. Actualice el consolidado primero.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Mejores alumnos por Escuela Profesional</h2>
+        <form class="inline-form" th:action="@{/analitica/olap}" method="get">
+            <div><label>Mostrar top</label><input type="number" name="topN" th:value="${topN}" min="1" max="100"/></div>
+            <button class="btn" type="submit">Aplicar</button>
+        </form>
+        <table style="margin-top:12px">
+            <thead><tr><th>Escuela</th><th>Alumno</th><th class="num">Rendimiento</th><th class="num">Posición</th></tr></thead>
+            <tbody>
+            <tr th:each="r : ${rankingTopN}">
+                <td th:text="${r[0]}">Escuela</td>
+                <td th:text="${r[1]}">Alumno</td>
+                <td class="num" th:text="${#numbers.formatDecimal(r[2],1,2)}">0.00</td>
+                <td class="num" th:text="${r[3]}">1</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(rankingTopN)}">
+                <td colspan="4" class="muted">Sin datos. Actualice el consolidado primero.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Distribución de notas por tipo de evaluación</h2>
+        <table>
+            <thead><tr><th>Evaluación</th><th class="num">Cantidad</th><th class="num">Promedio</th></tr></thead>
+            <tbody>
+            <tr th:each="r : ${distribucion}">
+                <td><span class="badge" th:text="${r[0]}">EC</span></td>
+                <td class="num" th:text="${r[1]}">0</td>
+                <td class="num" th:text="${#numbers.formatDecimal(r[2],1,2)}">0.00</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(distribucion)}">
+                <td colspan="3" class="muted">Sin datos.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Histórico de rendimiento de un alumno</h2>
+        <form class="inline-form" th:action="@{/analitica/olap}" method="get">
+            <input type="hidden" name="topN" th:value="${topN}"/>
+            <div><label>Código del alumno</label><input type="number" name="codigoAlumno" th:value="${codigoAlumno}"/></div>
+            <button class="btn" type="submit">Consultar</button>
+        </form>
+        <table style="margin-top:12px" th:if="${historico != null}">
+            <thead><tr><th>Periodo</th><th class="num">Rendimiento</th><th class="num">Posición</th><th>Escuela</th></tr></thead>
+            <tbody>
+            <tr th:each="r : ${historico}">
+                <td th:text="${r[0]}">2026-I</td>
+                <td class="num" th:text="${#numbers.formatDecimal(r[1],1,2)}">0.00</td>
+                <td class="num" th:text="${r[2]}">-</td>
+                <td th:text="${r[3]}">Escuela</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(historico)}">
+                <td colspan="4" class="muted">Sin datos para ese alumno.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Estadísticas de un curso</h2>
+        <form class="inline-form" th:action="@{/analitica/olap}" method="get">
+            <input type="hidden" name="topN" th:value="${topN}"/>
+            <div>
+                <label>Curso</label>
+                <select name="idCurso">
+                    <option th:each="c : ${cursos}" th:value="${c.idCurso}" th:text="${c.nombre}"
+                            th:selected="${idCurso != null and idCurso == c.idCurso}">curso</option>
+                </select>
+            </div>
+            <button class="btn" type="submit">Calcular</button>
+        </form>
+        <div th:if="${statsCurso != null}" style="margin-top:12px">
+            <p>Cantidad de notas: <strong th:text="${statsCurso[0]}">0</strong></p>
+            <p>Promedio: <strong th:text="${statsCurso[1] != null ? #numbers.formatDecimal(statsCurso[1],1,2) : '—'}">0.00</strong></p>
+            <p>Mínimo: <strong th:text="${statsCurso[2]}">0</strong> · Máximo: <strong th:text="${statsCurso[3]}">0</strong></p>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

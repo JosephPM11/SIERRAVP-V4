@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments :: commonhead}"></head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+
+<div class="container">
+    <h1 class="page-title">Bienvenido<span th:if="${usuario}" th:text="', ' + ${usuario.nombreCompleto()}"></span></h1>
+    <p class="page-sub">Portal del Sistema de Evaluación del Rendimiento Académico.</p>
+
+    <div class="grid">
+        <div class="card card-accent" sec:authorize="hasRole('PROFESOR')">
+            <h2>Mis cursos</h2>
+            <p class="muted">Registra y consulta las notas de los cursos que dictas.</p>
+            <a class="btn" th:href="@{/profesor}">Ir a mis cursos</a>
+        </div>
+        <div class="card card-accent" sec:authorize="hasRole('ALUMNO')">
+            <h2>Mi rendimiento</h2>
+            <p class="muted">Consulta tu coeficiente de rendimiento, tu posición y tu histórico de notas.</p>
+            <a class="btn" th:href="@{/alumno}">Ver mi rendimiento</a>
+        </div>
+        <div class="card card-accent" sec:authorize="hasRole('ADMIN')">
+            <h2>Gestión académica</h2>
+            <p class="muted">Cálculo del coeficiente de rendimiento y generación del ranking por escuela.</p>
+            <a class="btn" th:href="@{/sistema}">Abrir gestión</a>
+        </div>
+        <div class="card card-accent" sec:authorize="hasRole('ADMIN')">
+            <h2>Reportes</h2>
+            <p class="muted">Reportes gerenciales y estadísticas de rendimiento por facultad y escuela.</p>
+            <a class="btn" th:href="@{/analitica}">Abrir reportes</a>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

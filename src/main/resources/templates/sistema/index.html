@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: commonhead}"></head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+
+<div class="container">
+    <h1 class="page-title">Gestión académica</h1>
+    <p class="page-sub">Procesos de cálculo del rendimiento y del ranking.</p>
+
+    <div class="flash" th:if="${msg}" th:text="${msg}"></div>
+
+    <div class="grid">
+        <div class="card card-accent">
+            <h2>1 · Datos de demostración</h2>
+            <p class="muted">Genera escuelas, cursos, docentes, alumnos y notas de prueba.</p>
+            <p th:if="${yaPoblado}"><span class="badge green">Datos ya cargados</span></p>
+            <form th:action="@{/sistema/poblar}" method="post">
+                <button class="btn green" type="submit">Cargar datos de demostración</button>
+            </form>
+        </div>
+
+        <div class="card card-accent">
+            <h2>2 · Calcular rendimiento</h2>
+            <p class="muted">Calcula el coeficiente de rendimiento normalizado de los alumnos en el periodo seleccionado.</p>
+            <form class="inline-form" th:action="@{/sistema/cra}" method="post">
+                <div>
+                    <label>Periodo</label>
+                    <select name="periodo">
+                        <option value="2026-I">2026-I</option>
+                        <option value="2025-II">2025-II</option>
+                    </select>
+                </div>
+                <button class="btn" type="submit">Calcular</button>
+            </form>
+        </div>
+
+        <div class="card card-accent">
+            <h2>3 · Generar ranking</h2>
+            <p class="muted">Ordena a los alumnos por su rendimiento dentro de cada Escuela Profesional.</p>
+            <form th:action="@{/sistema/ranking}" method="post">
+                <button class="btn" type="submit">Generar ranking</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <p class="muted">Flujo recomendado: <strong>cargar datos → calcular rendimiento → generar ranking</strong>.
+            Luego revisa los <a th:href="@{/analitica}">reportes</a>.</p>
+    </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

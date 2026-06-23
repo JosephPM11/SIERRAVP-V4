@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: commonhead}"></head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+
+<div class="container">
+    <p class="crumb"><a th:href="@{/profesor}">&larr; Mis cursos</a></p>
+    <h1 class="page-title" th:if="${clase}" th:text="${clase.curso.nombre}">Curso</h1>
+    <p class="page-sub" th:if="${clase}">
+        Periodo <span th:text="${clase.periodo}"></span>
+        <span th:if="${editable}" class="badge green">Abierto</span>
+        <span th:unless="${editable}" class="badge closed">Cerrado · solo lectura</span>
+    </p>
+
+    <div class="flash" th:if="${msg}" th:text="${msg}"></div>
+    <div class="flash error" th:if="${error}" th:text="${error}"></div>
+
+    <div class="card" th:if="${editable}">
+        <h2>Registrar o actualizar nota</h2>
+        <form class="inline-form" th:action="@{'/profesor/clase/' + ${clase.id} + '/nota'}" method="post">
+            <div>
+                <label>Alumno</label>
+                <select name="codigoAlumno" required>
+                    <option th:each="a : ${alumnos}" th:value="${a.codigo}"
+                            th:text="${a.codigo} + ' — ' + ${a.nombreCompleto()}">cod</option>
+                </select>
+            </div>
+            <div>
+                <label>Evaluación</label>
+                <select name="tipo" required>
+                    <option th:each="t : ${tipos}" th:value="${t}" th:text="${t}">EC</option>
+                </select>
+            </div>
+            <div>
+                <label>Calificación (0–20)</label>
+                <input type="number" name="calificacion" min="0" max="20" required/>
+            </div>
+            <button class="btn" type="submit">Guardar nota</button>
+        </form>
+        <p class="muted">EC y EP ponderan 0.3 cada una; EF pondera 0.4.</p>
+    </div>
+
+    <div class="card" th:unless="${editable}">
+        <p class="muted">Este periodo está cerrado. Las notas se muestran en modo de solo lectura y no pueden modificarse.</p>
+    </div>
+
+    <div class="card">
+        <h2>Notas registradas</h2>
+        <table>
+            <thead>
+            <tr><th>Alumno</th><th>Evaluación</th><th class="num">Calificación</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="n : ${notas}">
+                <td th:text="${n.alumno.codigo} + ' — ' + ${n.alumno.nombreCompleto()}">alumno</td>
+                <td><span class="badge" th:text="${n.tipo}">EC</span></td>
+                <td class="num" th:text="${n.calificacion}">0</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(notas)}">
+                <td colspan="3" class="muted">Aún no hay notas en este curso.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>
