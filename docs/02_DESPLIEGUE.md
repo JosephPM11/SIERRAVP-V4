@@ -39,22 +39,24 @@ Abrir **http://localhost:8080**.
 
 ## 3. Guion de la demo (8–10 min)
 
-| Paso | Acción | Qué demuestra |
+| Paso | Acción (menú) | Qué demuestra |
 |------|--------|----------------|
 | 1 | Login `admin@unmsm.edu.pe` / `Admin2026` | CU-01 (autenticación + rol) |
-| 2 | Sistema → **Poblar BD** | Carga del OLTP (datos sintéticos) |
-| 3 | Sistema → **Calcular CRA** `2026-I` y `2025-II` | CU-05 (normalización de notas) |
-| 4 | Sistema → **Generar ranking** | CU-06 (ranking por escuela) |
-| 5 | Analítica → **Ejecutar ETL** | Carga del DataWareHouse (estrella) |
-| 6 | Analítica → **Ver reportes OLAP** | Cross-tab, Top-N, histórico, stats |
-| 7 | Analítica → **Publicar en FTP** + **Replicar a Mirror** | Capas FTP y Mirror |
-| 8 | Logout → login como profesor → ingresar una nota | CU-02 |
-| 9 | Logout → login como alumno → ver rendimiento | CU-03/04 |
+| 2 | Gestión académica → **Cargar datos de demostración** | Carga del OLTP (datos sintéticos) |
+| 3 | Gestión académica → **Calcular CRA** `2025-II` y `2026-I` | CU-05 (normalización de notas) |
+| 4 | Gestión académica → **Generar ranking** | CU-06 (ranking por escuela) |
+| 5 | Reportes → **Ejecutar ETL** | Carga del DataWareHouse (estrella) |
+| 6 | Reportes → **Ver reportes OLAP** | Cross-tab, Top-N, histórico por periodo |
+| 7 | Reportes → **Publicar en FTP** + **Replicar a Mirror** | Capas FTP y Mirror |
+| 8 | Logout → login como profesor → ingresar una nota (periodo vigente) | CU-02 |
+| 9 | Logout → login como alumno → ver rendimiento e histórico | CU-03/04 |
 
-### Credenciales de demo (tras “Poblar BD”)
+### Credenciales de demo (admin desde el arranque; resto tras “Cargar datos”)
 - **Admin**: `admin@unmsm.edu.pe` / `Admin2026`
 - **Profesor**: `profe2000@unmsm.edu.pe` … `profe2004@unmsm.edu.pe` / `profe123`
-- **Alumno**: `alumno20260001@unmsm.edu.pe` … `alumno20260060@unmsm.edu.pe` / `alumno123`
+- **Alumno**: `alumnoCODIGO@unmsm.edu.pe` / `alumno123` — el código empieza con el año de
+  ingreso (15 alumnos por año 2023–2026), p. ej. `alumno20230001`, `alumno20260001`.
+  Lista exacta: `SELECT codigo, ciclo FROM sierravp_transaccional.usuario WHERE tipo_usuario='alumno';`
 
 ## 4. Problemas comunes
 
@@ -65,6 +67,7 @@ Abrir **http://localhost:8080**.
 | Reportes OLAP vacíos | Faltó **Ejecutar ETL** (paso 5), o no calculaste CRA antes |
 | `mvn` no reconocido | Usa IntelliJ (Maven embebido) o instala Maven y agrégalo al PATH |
 | El alumno ve CRA 0 y posición 0 | Aún no corriste Calcular CRA + Generar ranking |
+| El profesor no puede editar una nota | Es un periodo **cerrado** (no vigente). Solo se editan notas de `sierravp.periodo-actual` |
 
 ## 5. Dos servidores reales (opcional)
 

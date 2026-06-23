@@ -40,6 +40,11 @@ Navegador → Controller (web) → Service (service) → Repository (repository)
 - Entidades normalizadas: `Usuario` (alumno/profesor/admin), `Facultad`, `EscuelaProfesional`,
   `Curso`, `Clase`, `Nota`, `CRA`, `Ranking`.
 - Configurada en `config/TransaccionalDataSourceConfig` (datasource **primario**).
+- El **código del alumno empieza con su año de ingreso** (`AÑO*10000 + correlativo`,
+  p. ej. `20260001`) y su `ciclo` se deriva de ese año. Por eso un alumno nunca tiene
+  notas en periodos anteriores a su ingreso (lo controla `SeedService` al poblar).
+- `config/DataInitializer` crea el usuario administrador al arrancar (si no existe), de
+  modo que se pueda iniciar sesión y "Cargar datos de demostración" desde el primer uso.
 
 ### 2.3 Capa DataWareHouse (dimensional)
 - Esquema `sierravp_datawarehouse`, modelo en **estrella**.
@@ -64,12 +69,17 @@ El ranking **no** usa la nota cruda 0–20, sino la **distancia del alumno respe
 promedio de su salón** (estandarización tipo z-score reescalada):
 
 ```
-ponderado = EC*0.3 + EP*0.3 + EF*0.4
-CRA       = 10 + 5 * (ponderado − mediaSalón) / desviaciónSalón     (acotado a [0,20])
+ponderado  = EC*0.3 + EP*0.3 + EF*0.4
+cra_clase  = 10 + 5 * (ponderado − mediaSalón) / desviaciónSalón    (acotado a [0,20])
+CRA(periodo) = promedio de los cra_clase del alumno en ese periodo
 ```
 
-Implementado en `service/CraService`. El ranking (`service/RankingService`) ordena por el
-CRA acumulado dentro de cada Escuela Profesional.
+Implementado en `service/CraService`: se guarda **una fila de CRA por (alumno, periodo)**
+(no una por clase). El `craPonderadoActual` del alumno = CRA del **periodo vigente**, y el
+ranking (`service/RankingService`) ordena por ese valor dentro de cada Escuela Profesional.
+
+`service/CalendarioAcademico` conoce el periodo vigente (`sierravp.periodo-actual`): solo
+ese periodo admite ingreso/edición de notas; los anteriores quedan **cerrados** (solo lectura).
 
 ## 4. Seguridad (capa transversal)
 

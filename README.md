@@ -80,17 +80,23 @@ Abre **http://localhost:8080** → te redirige al login.
 
 ## 4. Recorrido de la demo (5 min)
 
-1. **Login como admin**: `admin@unmsm.edu.pe` / `Admin2026`.
-2. **Sistema → Poblar BD** (genera facultad, escuelas, cursos, profesores, ~60 alumnos,
-   clases en 2 periodos y notas).
-3. **Sistema → Calcular CRA** para `2026-I` y luego `2025-II` (CU-05, normalización).
-4. **Sistema → Generar ranking** (CU-06).
-5. **Analítica → Ejecutar ETL** (carga el datawarehouse).
-6. **Analítica → Ver reportes OLAP** (cross-tabs, Top-N, histórico, etc.).
-7. **Analítica → Publicar en FTP** y **Replicar a Mirror** (capas simuladas).
+En el menú superior, las secciones de admin aparecen como **Gestión académica** y **Reportes**.
+
+1. **Login como admin**: `admin@unmsm.edu.pe` / `Admin2026` (el admin se crea solo al arrancar).
+2. **Gestión académica → Cargar datos de demostración** (genera facultad, escuelas, cursos,
+   profesores, 60 alumnos con años de ingreso 2023–2026, clases en 2 periodos y notas).
+3. **Gestión académica → Calcular CRA** para `2025-II` y luego `2026-I` (CU-05, normalización).
+4. **Gestión académica → Generar ranking** (CU-06).
+5. **Reportes → Ejecutar ETL** (carga el datawarehouse).
+6. **Reportes → Ver reportes OLAP** (cross-tabs, Top-N, histórico por periodo, etc.).
+7. **Reportes → Publicar en FTP** y **Replicar a Mirror** (capas simuladas).
 8. **Cerrar sesión** y entrar como **profesor** (`profe2000@unmsm.edu.pe` / `profe123`)
-   para ingresar notas, o como **alumno** (`alumno20260001@unmsm.edu.pe` / `alumno123`)
-   para ver su CRA y posición.
+   para ingresar notas (solo del periodo vigente), o como **alumno**
+   (`alumno20260001@unmsm.edu.pe` / `alumno123`) para ver su CRA, ranking e histórico.
+
+> El **código del alumno empieza con su año de ingreso** (p. ej. `2023xxxx`, `2026xxxx`)
+> y su ciclo se deriva de ese año. Solo se pueden ingresar/editar notas del **periodo
+> vigente** (`sierravp.periodo-actual`); los periodos anteriores quedan en solo lectura.
 
 Guion detallado en [docs/02_DESPLIEGUE.md](docs/02_DESPLIEGUE.md).
 
@@ -103,12 +109,12 @@ SIERRAVP-V3/
 ├── pom.xml
 ├── src/main/java/com/killa/sierravp/
 │   ├── SierravpWebApplication.java
-│   ├── config/        # 2 datasources (tx + DW) + seguridad
+│   ├── config/        # 2 datasources, seguridad, admin inicial (DataInitializer)
 │   ├── domain/        # entidades OLTP
 │   ├── dw/domain/     # entidades dimensionales (DW)
 │   ├── repository/    # Spring Data (transaccional)
 │   ├── dw/repository/ # Spring Data (datawarehouse)
-│   ├── service/       # CRA, ranking, ETL, OLAP, seed, FTP/Mirror, seguridad
+│   ├── service/       # CRA, ranking, ETL, OLAP, seed, FTP/Mirror, calendario, seguridad
 │   └── web/           # controladores MVC
 ├── src/main/resources/
 │   ├── application.properties
@@ -123,11 +129,17 @@ SIERRAVP-V3/
 
 ## 6. Qué mejora respecto a V2
 
-- **Es web (MVC)**, requisito del 3er entregable, en vez de consola/Swing.
-- **Corrige el ranking acumulado**: el `craPonderadoActual` es el promedio de los CRA
-  por clase del periodo, no el de la última clase procesada.
-- **Dimensión Tiempo real**: `Clase` ahora tiene `periodo`, así el DW deja de colapsar
-  todo a un único tiempo.
+- **Es web (MVC)**, requisito del 3er entregable, en vez de consola/Swing, con una
+  **interfaz institucional** (estilo UNMSM) sin elementos técnicos en las vistas de usuario.
+- **CRA por periodo**: se guarda **una fila de CRA por (alumno, periodo)** = promedio de
+  sus clases normalizadas, y el ranking usa el CRA del periodo vigente (la V2 se quedaba
+  con la última clase).
+- **Dimensión Tiempo real**: `Clase` tiene `periodo`, así el DW no colapsa todo a un solo tiempo.
 - **`Curso.creditos`** poblado (en V2 quedaba `null` en el DW).
-- **Credenciales fuera del binario** y **contraseñas cifradas** (BCrypt) en vez de texto plano.
+- **Código del alumno = año de ingreso + correlativo**, con ciclo coherente; un alumno
+  nunca aparece en periodos anteriores a su ingreso.
+- **Periodos cerrados**: solo se editan notas del periodo vigente; los anteriores son de
+  solo lectura (`CalendarioAcademico`).
+- **Histórico de notas por periodo** para el alumno (y por periodo en los reportes OLAP).
+- **Seguridad**: credenciales fuera del binario, contraseñas **BCrypt**, login y roles.
 - Añade **capas FTP y Mirror** simuladas, que el 3er entregable lista explícitamente.
