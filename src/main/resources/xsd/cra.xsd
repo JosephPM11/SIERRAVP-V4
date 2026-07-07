@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://killa.com/sierravp/ws/cra"
+           targetNamespace="http://killa.com/sierravp/ws/cra"
+           elementFormDefault="qualified">
+
+    <!-- Petición: código del alumno cuyo CRA se desea consultar. -->
+    <xs:element name="getCraRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="codigoAlumno" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Respuesta: CRA actual, nombre y posición en el ranking del alumno. -->
+    <xs:element name="getCraResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="codigoAlumno" type="xs:int"/>
+                <xs:element name="encontrado" type="xs:boolean"/>
+                <xs:element name="nombre" type="xs:string" minOccurs="0"/>
+                <xs:element name="cra" type="xs:double" minOccurs="0"/>
+                <xs:element name="posicionRanking" type="xs:int" minOccurs="0"/>
+                <xs:element name="mensaje" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
